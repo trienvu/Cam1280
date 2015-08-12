@@ -1,6 +1,7 @@
 package studio.elnino.com.cameditor;
 
 import android.app.Application;
+
 import com.aviary.android.feather.sdk.IAviaryClientCredentials;
 
 /**
@@ -10,6 +11,7 @@ public class CamApplication extends Application implements IAviaryClientCredenti
     private static final String TAG = CamApplication.class.getSimpleName();
     private static final String APP_ID = "120d22e28267468db3802b9c359bab77";
     private static final String APP_SECRET = "a8a6b6fe-3f67-4da0-8f43-d8025743ba85";
+
     @Override
     public void onCreate() {
         super.onCreate();

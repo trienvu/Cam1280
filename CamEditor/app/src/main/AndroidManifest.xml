@@ -6,25 +6,34 @@
     <application
         android:name="studio.elnino.com.cameditor.CamApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         >
+
         <activity
-            android:name=".CamActivity"
-            android:label="@string/app_name">
+            android:name=".HomeMenuActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="unspecified">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
+        <!--
+            Required by the CreativeSDKImage
+            The "android:authorities" property MUST follow the following rule:
+                {your_app_package_name}.AviaryCdsProvider
+        -->
         <provider
-            android:name="com.adobe.creativesdk.aviary.internal.cds.AviaryCdsProvider"
-            android:authorities="${applicationId}.AviaryCdsProvider"
+            android:name="com.aviary.android.feather.sdk.internal.cds.AviaryCdsProvider"
+            android:authorities="com.aviary.android.sample.AviaryCdsProvider"
+            android:process=":aviarycds"
             android:exported="false" />
 
-    </application>
 
+    </application>
 </manifest>
