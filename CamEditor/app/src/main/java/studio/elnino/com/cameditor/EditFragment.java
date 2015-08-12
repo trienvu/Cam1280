@@ -65,7 +65,7 @@ public class EditFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.activity_cam, null,
+        View v = inflater.inflate(R.layout.fragment_editor, null,
                 false);
         mGalleryButton = (Button) v.findViewById(R.id.button1);
         mEditButton = (Button) v.findViewById(R.id.button2);

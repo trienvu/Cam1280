@@ -57,7 +57,7 @@ public class CamActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_cam);
+        setContentView(R.layout.fragment_editor);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         imageWidth = (int) ((float) metrics.widthPixels / 1.5);
