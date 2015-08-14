@@ -41,7 +41,9 @@ public class EditFragment extends Fragment {
     private static final int ACTION_REQUEST_GALLERY = 99;
     private static final int ACTION_REQUEST_FEATHER = 100;
     private static final int EXTERNAL_STORAGE_UNAVAILABLE = 1;
-    /** Folder name on the sdcard where the images will be saved * */
+    /**
+     * Folder name on the sdcard where the images will be saved *
+     */
     private static final String FOLDER_NAME = "aviary-sample";
     Button mGalleryButton;
     Button mEditButton;
@@ -63,7 +65,7 @@ public class EditFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_editor, null,
                 false);
@@ -228,6 +230,7 @@ public class EditFragment extends Fragment {
                     loadAsync(data.getData());
                     break;
 
+
                 case ACTION_REQUEST_FEATHER:
 
                     boolean changed = true;
@@ -275,7 +278,7 @@ public class EditFragment extends Fragment {
      *
      * @param uri
      */
-    @SuppressWarnings ("deprecation")
+    @SuppressWarnings("deprecation")
     private boolean setImageURI(final Uri uri, final Bitmap bitmap) {
         mImage.setImageBitmap(bitmap);
         mImage.setBackgroundDrawable(null);
@@ -303,7 +306,7 @@ public class EditFragment extends Fragment {
      *
      * @return
      */
-    @SuppressWarnings ("unused")
+    @SuppressWarnings("unused")
     private Uri pickRandomImage() {
         Cursor c = mContext.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -352,7 +355,7 @@ public class EditFragment extends Fragment {
      *
      * @param uri
      */
-    @SuppressWarnings ("deprecation")
+    @SuppressWarnings("deprecation")
     private void startFeather(Uri uri) {
         Log.d(LOG_TAG, "uri: " + uri);
 

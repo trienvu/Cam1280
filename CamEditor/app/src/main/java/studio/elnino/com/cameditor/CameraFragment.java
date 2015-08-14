@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 public class CameraFragment extends Fragment {
     public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 

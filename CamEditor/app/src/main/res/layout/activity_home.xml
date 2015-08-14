@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/home_background"
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}">
 
@@ -9,10 +10,13 @@
         android:id="@+id/menuTop"
         layout="@layout/action_bar_home" />
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
+    <ImageView
+        android:id="@+id/ivPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:padding="20dp"
+        android:src="@drawable/girl"
         android:layout_above="@+id/menuHome"
         android:layout_below="@+id/menuTop" />
 
@@ -20,50 +24,57 @@
     <LinearLayout
         android:id="@+id/menuHome"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/action_bar"
+        android:background="@color/tabs_bar"
         android:orientation="horizontal"
         android:weightSum="4">
 
         <TextView
-            android:id="@+id/tvMenuHome"
+            android:id="@+id/tvCamera"
+            style="@style/tabs_style"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawablePadding="5dp"
+            android:drawableTop="@drawable/ic_camera_active"
             android:gravity="center"
             android:padding="10dp"
-            android:text="XX" />
+            android:text="Camera" />
 
         <TextView
-            android:id="@+id/tvMenuLife"
+            android:id="@+id/tvEditPhoto"
+            style="@style/tabs_style"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawablePadding="5dp"
+            android:drawableTop="@drawable/ic_edit_active"
             android:gravity="center"
             android:padding="10dp"
-            android:text="AA" />
+            android:text="Edit" />
 
         <TextView
-            android:id="@+id/tvMenuDiscovery"
+            android:id="@+id/tvGallery"
+            style="@style/tabs_style"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawablePadding="5dp"
+            android:drawableTop="@drawable/ic_gallery_active"
             android:gravity="center"
             android:padding="10dp"
-            android:text="YY" />
+            android:text="Gallery" />
 
         <TextView
-            android:id="@+id/tvMenuMe"
+            android:id="@+id/tvCollage"
+            style="@style/tabs_style"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawablePadding="5dp"
+            android:drawableTop="@drawable/ic_collage_active"
             android:gravity="center"
             android:padding="10dp"
-            android:text="ZZ" />
+            android:text="Collage" />
     </LinearLayout>
 </RelativeLayout>

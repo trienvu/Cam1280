@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
-    <color name="action_bar">#8DC230</color>
-
+    <color name="action_bar">#ff073d2a</color>
+    <color name="tabs_bar">#ff073d2a</color>
+    <color name="home_background">#fffbeae3</color>
 </resources>
