@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -127,6 +129,17 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
 
             }
         });
+        mIvPhoto.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = pickRandomImage();
+                if (uri != null) {
+                    Log.d(TAG, "image uri: " + uri);
+                    loadAsync(uri);
+                }
+            }
+        });
+
     }
 
 
@@ -200,14 +213,14 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                     Log.w(
                             TAG,
                             "User did not modify the image, but just clicked on 'Done' button");
+                } else {
+                    // send a notification to the media scanner
+                    updateMedia(mOutputFilePath);
+
+                    // update the preview with the result
+                    loadAsync(data.getData());
+                    mOutputFilePath = null;
                 }
-
-                // send a notification to the media scanner
-                updateMedia(mOutputFilePath);
-
-                // update the preview with the result
-                loadAsync(data.getData());
-                mOutputFilePath = null;
                 break;
         }
     }
@@ -242,6 +255,36 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         Intent chooser = Intent.createChooser(intent, "Choose a Picture");
         startActivityForResult(chooser, ACTION_REQUEST_GALLERY);
     }
+    /**
+     * Pick a random image from the user gallery
+     *
+     * @return
+     */
+    @SuppressWarnings ("unused")
+    private Uri pickRandomImage() {
+        Cursor c = getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DATA},
+                MediaStore.Images.ImageColumns.SIZE + ">?", new String[]{"90000"}, MediaStore.Images.ImageColumns._ID);
+        Uri uri = null;
+
+        if (c != null) {
+            int total = c.getCount();
+            int position = (int) (Math.random() * total);
+            if (total > 0) {
+                if (c.moveToPosition(position)) {
+                    String data = c.getString(
+                            c.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+                    long id = c.getLong(
+                            c.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+                    uri = Uri.parse(data);
+                }
+            }
+            c.close();
+        }
+        return uri;
+    }
+
 
     /**
      * Once you've chosen an image you can start the feather activity
