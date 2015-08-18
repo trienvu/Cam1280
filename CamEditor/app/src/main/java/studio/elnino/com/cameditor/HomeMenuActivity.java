@@ -43,7 +43,7 @@ import java.io.File;
 public class HomeMenuActivity extends FragmentActivity implements Callback {
     private static final String TAG = "HomeMenuActivity";
 
-    private static final String COLLAGE_APP_PACKAGE_NAME = "com.fortunetechlab.photo.grid.shape.collage";
+    private static final String COLLAGE_APP_PACKAGE_NAME = "com.roidapp.photogrid";
     private static final int ACTION_REQUEST_CAMERA = 0;
     private static final int ACTION_REQUEST_EDIT = 1;
     private static final int ACTION_REQUEST_GALLERY = 2;
