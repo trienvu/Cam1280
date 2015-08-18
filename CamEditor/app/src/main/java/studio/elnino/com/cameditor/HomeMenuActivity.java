@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -39,6 +41,8 @@ import java.io.File;
 
 public class HomeMenuActivity extends FragmentActivity implements Callback {
     private static final String TAG = "HomeMenuActivity";
+
+    private static final String COLLAGE_APP_PACKAGE_NAME = "com.roidapp.photogrid";
     private static final int ACTION_REQUEST_CAMERA = 0;
     private static final int ACTION_REQUEST_EDIT = 1;
     private static final int ACTION_REQUEST_GALLERY = 2;
@@ -124,7 +128,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
 
             @Override
             public void onClick(View v) {
-
+                openCollageApp(mContext, COLLAGE_APP_PACKAGE_NAME);
             }
         });
     }
@@ -241,6 +245,30 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
 
         Intent chooser = Intent.createChooser(intent, "Choose a Picture");
         startActivityForResult(chooser, ACTION_REQUEST_GALLERY);
+    }
+
+    /**
+     * Open another app.
+     *
+     * @param context     current Context, like Activity, App, or Service
+     * @param packageName the full package name of the app to open
+     * @return true if likely successful, false if unsuccessful
+     */
+    public static boolean openCollageApp(Context context, String packageName) {
+        PackageManager manager = context.getPackageManager();
+        try {
+            Intent i = manager.getLaunchIntentForPackage(packageName);
+            if (i == null) {
+                return false;
+                //throw new PackageManager.NameNotFoundException();
+            }
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addCategory(Intent.CATEGORY_LAUNCHER);
+            context.startActivity(i);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
