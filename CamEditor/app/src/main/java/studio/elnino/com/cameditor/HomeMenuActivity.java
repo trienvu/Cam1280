@@ -43,7 +43,7 @@ import java.io.File;
 public class HomeMenuActivity extends FragmentActivity implements Callback {
     private static final String TAG = "HomeMenuActivity";
 
-    private static final String COLLAGE_APP_PACKAGE_NAME = "com.roidapp.photogrid";
+    private static final String COLLAGE_APP_PACKAGE_NAME = "com.lyrebirdstudio.mirror_collage";
     private static final int ACTION_REQUEST_CAMERA = 0;
     private static final int ACTION_REQUEST_EDIT = 1;
     private static final int ACTION_REQUEST_GALLERY = 2;
@@ -142,6 +142,12 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                 }
             }
         });
+
+        Uri uri = pickRandomImage();
+        if (uri != null) {
+            Log.d(TAG, "image uri: " + uri);
+            loadAsync(uri);
+        }
 
     }
 
@@ -301,9 +307,11 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         try {
             Intent i = manager.getLaunchIntentForPackage(packageName);
             if (i == null) {
+                Log.d(TAG, "Null cmnr");
                 return false;
                 //throw new PackageManager.NameNotFoundException();
             }
+            Log.d(TAG, "Not Null cmnr");
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.addCategory(Intent.CATEGORY_LAUNCHER);
             context.startActivity(i);
