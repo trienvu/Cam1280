@@ -18,7 +18,7 @@
         android:layout_below="@+id/menuTop"
         android:padding="20dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/girl" />
+        android:src="@drawable/ic_girls" />
 
 
     <LinearLayout
@@ -36,7 +36,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-
             android:drawableTop="@drawable/ic_camera_active"
             android:gravity="center"
             android:padding="10dp"

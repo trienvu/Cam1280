@@ -43,7 +43,7 @@ import java.io.File;
 public class HomeMenuActivity extends FragmentActivity implements Callback {
     private static final String TAG = "HomeMenuActivity";
 
-    private static final String COLLAGE_APP_PACKAGE_NAME = "com.lyrebirdstudio.mirror_collage";
+    private static final String COLLAGE_APP_PACKAGE_NAME = "com.zentertain.photocollage2";
     private static final int ACTION_REQUEST_CAMERA = 0;
     private static final int ACTION_REQUEST_EDIT = 1;
     private static final int ACTION_REQUEST_GALLERY = 2;
@@ -264,12 +264,13 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         Intent chooser = Intent.createChooser(intent, "Choose a Picture");
         startActivityForResult(chooser, ACTION_REQUEST_GALLERY);
     }
+
     /**
      * Pick a random image from the user gallery
      *
      * @return
      */
-    @SuppressWarnings ("unused")
+    @SuppressWarnings("unused")
     private Uri pickRandomImage() {
         Cursor c = getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -308,10 +309,11 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
             Intent i = manager.getLaunchIntentForPackage(packageName);
             if (i == null) {
                 Log.d(TAG, "Null cmnr");
-                return false;
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri
+                        .parse("market://details?id=" + packageName)));
+                return true;
                 //throw new PackageManager.NameNotFoundException();
             }
-            Log.d(TAG, "Not Null cmnr");
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.addCategory(Intent.CATEGORY_LAUNCHER);
             context.startActivity(i);
@@ -453,7 +455,11 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
             mProgress.setCancelable(true);
             mProgress.setMessage("Loading image...");
             mProgress.setOnCancelListener(this);
-            mProgress.show();
+            try {
+                mProgress.show();
+            } catch (Exception e) {
+
+            }
         }
 
         @Override
@@ -483,8 +489,13 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
 
-            if (mProgress.getWindow() != null) {
-                mProgress.dismiss();
+            try {
+                if (mProgress.getWindow() != null && mProgress.isShowing()) {
+                    mProgress.dismiss();
+                }
+
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
             }
 
             if (result != null) {
