@@ -38,6 +38,8 @@ import com.aviary.android.feather.sdk.internal.headless.utils.MegaPixels;
 import com.aviary.android.feather.sdk.internal.utils.DecodeUtils;
 import com.aviary.android.feather.sdk.internal.utils.ImageInfo;
 
+import org.apache.http.client.utils.URIUtils;
+
 import java.io.File;
 
 public class HomeMenuActivity extends FragmentActivity implements Callback {
@@ -52,7 +54,13 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
     /**
      * Folder name on the sdcard where the images will be saved *
      */
-    private static final String FOLDER_NAME = "aviary-sample";
+    public static final String SD_CARD_PATH = Environment
+            .getExternalStorageDirectory().toString() + "/";
+
+    public static final String SAVE_FILE_DIR = "CamEditor";
+    private static final String SAVE_FILE_PATH = SD_CARD_PATH
+            + SAVE_FILE_DIR;
+    private static final String FOLDER_NAME = SAVE_FILE_DIR;
     private LinearLayout menuHome;
     public static final int PAGE_HOME = 0;
     public static final int PAGE_LIFE = 1;
@@ -135,7 +143,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         mIvPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = pickRandomImage();
+                Uri uri = pickEidtedImage();
                 if (uri != null) {
                     Log.d(TAG, "image uri: " + uri);
                     loadAsync(uri);
@@ -143,7 +151,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
             }
         });
 
-        Uri uri = pickRandomImage();
+        Uri uri = pickEidtedImage();
         if (uri != null) {
             Log.d(TAG, "image uri: " + uri);
             loadAsync(uri);
@@ -292,6 +300,42 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
             }
             c.close();
         }
+        return uri;
+    }
+
+
+    /**
+     * Pick a random image from the user gallery
+     *
+     * @return
+     */
+    @SuppressWarnings("unused")
+    private Uri pickEidtedImage() {
+        Uri query_uri = Uri.parse(SAVE_FILE_PATH);
+        Log.d(TAG,  MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString());
+        Log.d(TAG, query_uri.toString());
+        Cursor c = getContentResolver().query(
+                query_uri,
+                new String[]{MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DATA},
+                MediaStore.Images.ImageColumns.SIZE + ">?", new String[]{"90000"}, MediaStore.Images.ImageColumns._ID);
+        Uri uri = null;
+
+        if (c != null) {
+            Log.d(TAG, "1");
+            int total = c.getCount();
+            int position = (int) (Math.random() * total);
+            if (total > 0) {
+                if (c.moveToPosition(position)) {
+                    String data = c.getString(
+                            c.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+                    long id = c.getLong(
+                            c.getColumnIndex(MediaStore.Images.ImageColumns._ID));
+                    uri = Uri.parse(data);
+                }
+            }
+            c.close();
+        }else
+            Log.d(TAG, "2");
         return uri;
     }
 
