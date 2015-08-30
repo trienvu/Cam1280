@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -37,8 +36,7 @@ import com.aviary.android.feather.sdk.internal.Constants;
 import com.aviary.android.feather.sdk.internal.headless.utils.MegaPixels;
 import com.aviary.android.feather.sdk.internal.utils.DecodeUtils;
 import com.aviary.android.feather.sdk.internal.utils.ImageInfo;
-
-import org.apache.http.client.utils.URIUtils;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
@@ -95,7 +93,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
 
         findViews();
         initialize();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mHandler = new Handler(this);
     }
 
@@ -194,6 +192,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         return true;
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -204,7 +203,13 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
 //                    mIvPhoto.setImageBitmap(bp);
 //                }
                     // user chose an image from the gallery
-                    loadAsync(data.getData());
+                    Log.d(TAG, "XX" + data.getData().toString());
+//                    loadAsync(data.getData());
+//                    Uri imageContent = data.getData();
+//                    Picasso.with(mContext).load(imageContent).into(mIvPhoto);
+                    Picasso.with(mContext)
+                            .load("https://cms-assets.tutsplus.com/uploads/users/21/posts/19431/featured_image/CodeFeature.jpg")
+                            .into(mIvPhoto);
                 }
                 break;
             case ACTION_REQUEST_GALLERY:
@@ -312,7 +317,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
     @SuppressWarnings("unused")
     private Uri pickEidtedImage() {
         Uri query_uri = Uri.parse(SAVE_FILE_PATH);
-        Log.d(TAG,  MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString());
+        Log.d(TAG, MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString());
         Log.d(TAG, query_uri.toString());
         Cursor c = getContentResolver().query(
                 query_uri,
@@ -334,7 +339,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                 }
             }
             c.close();
-        }else
+        } else
             Log.d(TAG, "2");
         return uri;
     }
@@ -447,8 +452,12 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
     private void loadAsync(final Uri uri) {
         Drawable toRecycle = mIvPhoto.getDrawable();
         if (toRecycle != null && toRecycle instanceof BitmapDrawable) {
-            if (((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap() != null) {
-                ((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap().recycle();
+            if (((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap() != null && !((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap().isRecycled()) {
+                try {
+                    ((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap().recycle();
+                } catch (Exception e) {
+
+                }
             }
         }
         mIvPhoto.setImageDrawable(null);
@@ -499,11 +508,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
             mProgress.setCancelable(true);
             mProgress.setMessage("Loading image...");
             mProgress.setOnCancelListener(this);
-            try {
-                mProgress.show();
-            } catch (Exception e) {
-
-            }
+            mProgress.show();
         }
 
         @Override
