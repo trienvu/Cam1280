@@ -70,7 +70,7 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
     public static final String KEY_INDEX_OF_PAGE_SELECTED = "selected_page_index";
     public static int selectedPage = PAGE_HOME;
 
-    private TextView mTvCamera, mTvGallery, mTvEditPhoto, mTvCollage;
+    private TextView mTvCamera, mTvGallery, mTvEditPhoto;
     private ImageView mIvPhoto;
 
     // Main Handler
@@ -104,7 +104,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         mTvCamera = (TextView) findViewById(R.id.tvCamera);
         mTvGallery = (TextView) findViewById(R.id.tvGallery);
         mTvEditPhoto = (TextView) findViewById(R.id.tvEditPhoto);
-        mTvCollage = (TextView) findViewById(R.id.tvCollage);
         mIvPhoto = (ImageView) findViewById(R.id.ivPhoto);
     }
 
@@ -131,13 +130,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                 if (mImageUri != null) {
                     startFeather(mImageUri);
                 }
-            }
-        });
-        mTvCollage.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                openCollageApp(mContext, COLLAGE_APP_PACKAGE_NAME);
             }
         });
         mIvPhoto.setOnClickListener(new OnClickListener() {
