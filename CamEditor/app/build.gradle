@@ -83,10 +83,9 @@ android {
 dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:multidex:1.0.0'
-
     // link for the developers (should be always commented)
     //compile 'com.adobe.creativesdk:image:4.0.0'
-
     // internal dependency (uncomment during development)
     compile 'com.adobe.creativesdk:image:4.0.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }
