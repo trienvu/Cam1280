@@ -18,7 +18,7 @@
         >
 
         <activity
-            android:name=".CamActivity"
+            android:name=".HomeMenuActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
@@ -29,8 +29,6 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".HomeMenuActivity"
-            android:screenOrientation="portrait"/>
 
         <!--
             Required by the CreativeSDKImage

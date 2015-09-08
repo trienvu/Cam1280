@@ -1,46 +1,40 @@
 package studio.elnino.com.cameditor;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
-import android.util.DisplayMetrics;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aviary.android.feather.sdk.AviaryIntent;
 import com.aviary.android.feather.sdk.internal.Constants;
 import com.aviary.android.feather.sdk.internal.headless.utils.MegaPixels;
-import com.aviary.android.feather.sdk.internal.utils.DecodeUtils;
-import com.aviary.android.feather.sdk.internal.utils.ImageInfo;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
-public class HomeMenuActivity extends FragmentActivity implements Callback {
+public class HomeMenuActivity extends Activity implements Callback {
     private static final String TAG = "HomeMenuActivity";
 
     private static final String COLLAGE_APP_PACKAGE_NAME = "com.zentertain.photocollage2";
@@ -54,31 +48,24 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
      */
     public static final String SD_CARD_PATH = Environment
             .getExternalStorageDirectory().toString() + "/";
+    public static final String FOLDER_NAME = "CamEditor";
+    public static final String SAVE_FILE_PATH = SD_CARD_PATH
+            + FOLDER_NAME;
 
-    public static final String SAVE_FILE_DIR = "CamEditor";
-    private static final String SAVE_FILE_PATH = SD_CARD_PATH
-            + SAVE_FILE_DIR;
-    private static final String FOLDER_NAME = SAVE_FILE_DIR;
-    private LinearLayout menuHome;
-    public static final int PAGE_HOME = 0;
-    public static final int PAGE_LIFE = 1;
-    public static final int PAGE_DISCOVERY = 2;
-    public static final int PAGE_ME = 3;
-    public static final int PAGE_FILE = 4;
-    public static final String KEY_INDEX_OF_PAGE_SELECTED = "selected_page_index";
-    public static int selectedPage = PAGE_HOME;
+    private TextView mTvCamera, mTvGallery, mTvEdit;
+    private ImageView mIvShare, mIvDelete;
+    private ViewPager mPgPhotos;
 
-    private TextView mTvCamera, mTvGallery, mTvEditPhoto;
-    private ImageView mIvPhoto;
-
+    private PhotosAdapter mPhotosAdapter;
     // Main Handler
     private static Handler mHandler;
 
     String mOutputFilePath;
     Uri mImageUri;
-    int imageWidth, imageHeight;
     File mGalleryFolder;
+    File[] mFiles;
 
+    private Dialog mConfirmDeleteDialog;
     private Context mContext;
 
     @Override
@@ -87,26 +74,22 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home);
         mContext = this;
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        imageWidth = (int) ((float) metrics.widthPixels / 1.5);
-        imageHeight = (int) ((float) metrics.heightPixels / 1.5);
-
         findViews();
         initialize();
-//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mHandler = new Handler(this);
     }
 
     private void findViews() {
-        menuHome = (LinearLayout) findViewById(R.id.menuHome);
+        mPgPhotos = (ViewPager) findViewById(R.id.pgPhotos);
         mTvCamera = (TextView) findViewById(R.id.tvCamera);
         mTvGallery = (TextView) findViewById(R.id.tvGallery);
-        mTvEditPhoto = (TextView) findViewById(R.id.tvEditPhoto);
-        mIvPhoto = (ImageView) findViewById(R.id.ivPhoto);
+        mTvEdit = (TextView) findViewById(R.id.tvEdit);
+        mIvDelete = (ImageView) findViewById(R.id.ivDelete);
+        mIvShare = (ImageView) findViewById(R.id.ivShare);
     }
 
     public void initialize() {
-        mGalleryFolder = createFolders();
         mTvCamera.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -121,34 +104,51 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                 pickFromGallery();
             }
         });
-        mTvEditPhoto.setOnClickListener(new OnClickListener() {
+        mTvEdit.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                File file = mFiles[mPgPhotos.getCurrentItem()];
+                mImageUri = Uri.parse(file.getAbsolutePath());
                 if (mImageUri != null) {
                     startFeather(mImageUri);
                 }
             }
         });
-        mIvPhoto.setOnClickListener(new OnClickListener() {
+
+        mIvDelete.setOnClickListener(new OnClickListener() {
+
             @Override
-            public void onClick(View view) {
-                Uri uri = pickEidtedImage();
-                if (uri != null) {
-                    Log.d(TAG, "image uri: " + uri);
-                    loadAsync(uri);
-                }
+            public void onClick(View v) {
+                showDeleteDialog(mContext);
             }
         });
 
-        Uri uri = pickEidtedImage();
-        if (uri != null) {
-            Log.d(TAG, "image uri: " + uri);
-            loadAsync(uri);
-        }
+        mIvShare.setOnClickListener(new OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                sharePic();
+            }
+        });
+
+        mGalleryFolder = createFolders();
+        File targetDirector = new File(mGalleryFolder.getAbsolutePath());
+        mFiles = targetDirector.listFiles();
+        if (mFiles == null || mFiles.length == 0)
+            return;
+
+        mPhotosAdapter = new PhotosAdapter(this, mFiles);
+        mPgPhotos.setAdapter(mPhotosAdapter);
     }
 
+    private void refreshList() {
+        File targetDirector = new File(mGalleryFolder.getAbsolutePath());
+        mFiles = targetDirector.listFiles();
+        if (mPhotosAdapter == null)
+            mPhotosAdapter = new PhotosAdapter(this, mFiles);
+        mPhotosAdapter.refreshData(mFiles);
+    }
 
     @Override
     protected void onResume() {
@@ -191,23 +191,13 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         switch (requestCode) {
             case ACTION_REQUEST_CAMERA:
                 if (data != null) {
-//                    Bitmap bp = (Bitmap) data.getExtras().get("data");
-//                    mIvPhoto.setImageBitmap(bp);
-//                }
-                    // user chose an image from the gallery
-                    Log.d(TAG, "XX" + data.getData().toString());
-//                    loadAsync(data.getData());
-//                    Uri imageContent = data.getData();
-//                    Picasso.with(mContext).load(imageContent).into(mIvPhoto);
-                    Picasso.with(mContext)
-                            .load("https://cms-assets.tutsplus.com/uploads/users/21/posts/19431/featured_image/CodeFeature.jpg")
-                            .into(mIvPhoto);
+                    startFeather(data.getData());
                 }
                 break;
             case ACTION_REQUEST_GALLERY:
                 if (data != null) {
                     // user chose an image from the gallery
-                    loadAsync(data.getData());
+                    startFeather(data.getData());
                 }
                 break;
             case ACTION_REQUEST_FEATHER:
@@ -232,7 +222,8 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                     updateMedia(mOutputFilePath);
 
                     // update the preview with the result
-                    loadAsync(data.getData());
+//                    loadAsync(data.getData());
+                    refreshList();
                     mOutputFilePath = null;
                 }
                 break;
@@ -300,43 +291,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         return uri;
     }
 
-
-    /**
-     * Pick a random image from the user gallery
-     *
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private Uri pickEidtedImage() {
-        Uri query_uri = Uri.parse(SAVE_FILE_PATH);
-        Log.d(TAG, MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString());
-        Log.d(TAG, query_uri.toString());
-        Cursor c = getContentResolver().query(
-                query_uri,
-                new String[]{MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DATA},
-                MediaStore.Images.ImageColumns.SIZE + ">?", new String[]{"90000"}, MediaStore.Images.ImageColumns._ID);
-        Uri uri = null;
-
-        if (c != null) {
-            Log.d(TAG, "1");
-            int total = c.getCount();
-            int position = (int) (Math.random() * total);
-            if (total > 0) {
-                if (c.moveToPosition(position)) {
-                    String data = c.getString(
-                            c.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-                    long id = c.getLong(
-                            c.getColumnIndex(MediaStore.Images.ImageColumns._ID));
-                    uri = Uri.parse(data);
-                }
-            }
-            c.close();
-        } else
-            Log.d(TAG, "2");
-        return uri;
-    }
-
-
     /**
      * Open another app.
      *
@@ -371,8 +325,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
      */
     @SuppressWarnings("deprecation")
     private void startFeather(Uri uri) {
-        Log.d(TAG, "uri: " + uri);
-
         // first check the external storage availability
         if (!isExternalStorageAvailable()) {
             showDialog(EXTERNAL_STORAGE_UNAVAILABLE);
@@ -436,28 +388,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         return false;
     }
 
-    /**
-     * Load the incoming Image
-     *
-     * @param uri
-     */
-    private void loadAsync(final Uri uri) {
-        Drawable toRecycle = mIvPhoto.getDrawable();
-        if (toRecycle != null && toRecycle instanceof BitmapDrawable) {
-            if (((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap() != null && !((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap().isRecycled()) {
-                try {
-                    ((BitmapDrawable) mIvPhoto.getDrawable()).getBitmap().recycle();
-                } catch (Exception e) {
-
-                }
-            }
-        }
-        mIvPhoto.setImageDrawable(null);
-        mImageUri = null;
-
-        DownloadAsync task = new DownloadAsync();
-        task.execute(uri);
-    }
 
     private File createFolders() {
         File baseDir;
@@ -473,7 +403,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
             return Environment.getExternalStorageDirectory();
         }
 
-        Log.d(TAG, "Pictures folder: " + baseDir.getAbsolutePath());
         File aviaryFolder = new File(baseDir, FOLDER_NAME);
 
         if (aviaryFolder.exists()) {
@@ -484,99 +413,6 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
         }
 
         return Environment.getExternalStorageDirectory();
-    }
-
-    class DownloadAsync extends AsyncTask<Uri, Void, Bitmap> implements
-            DialogInterface.OnCancelListener {
-        ProgressDialog mProgress;
-        private Uri mUri;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            mProgress = new ProgressDialog(mContext);
-            mProgress.setIndeterminate(true);
-            mProgress.setCancelable(true);
-            mProgress.setMessage("Loading image...");
-            mProgress.setOnCancelListener(this);
-            mProgress.show();
-        }
-
-        @Override
-        protected Bitmap doInBackground(Uri... params) {
-            mUri = params[0];
-
-            Bitmap bitmap = null;
-
-//            while (mImageContainer.getWidth() < 1) {
-//                try {
-//                    Thread.sleep(1);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            final int w = mImageContainer.getWidth();
-//            Log.d(TAG, "width: " + w);
-            ImageInfo info = new ImageInfo();
-            bitmap = DecodeUtils.decode(
-                    mContext, mUri, imageWidth,
-                    imageHeight, info);
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            super.onPostExecute(result);
-
-            try {
-                if (mProgress.getWindow() != null && mProgress.isShowing()) {
-                    mProgress.dismiss();
-                }
-
-            } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
-            }
-
-            if (result != null) {
-                setImageURI(mUri, result);
-            } else {
-                Toast.makeText(
-                        mContext,
-                        "Failed to load image " + mUri, Toast.LENGTH_SHORT)
-                        .show();
-            }
-        }
-
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            Log.i(TAG, "onProgressCancel");
-            this.cancel(true);
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            Log.i(TAG, "onCancelled");
-        }
-    }
-
-    /**
-     * Given an Uri load the bitmap into the current ImageView and resize it to
-     * fit the image container size
-     *
-     * @param uri
-     */
-    @SuppressWarnings("deprecation")
-    private boolean setImageURI(final Uri uri, final Bitmap bitmap) {
-        mIvPhoto.setImageBitmap(bitmap);
-        mIvPhoto.setBackgroundDrawable(null);
-
-        mTvEditPhoto.setEnabled(true);
-        mImageUri = uri;
-
-        return true;
     }
 
     /**
@@ -591,4 +427,44 @@ public class HomeMenuActivity extends FragmentActivity implements Callback {
                 new String[]{filepath}, null, null);
     }
 
+    private void doDeleteFile() {
+
+        File file = mFiles[mPgPhotos.getCurrentItem()];
+        if (file.exists())
+            file.delete();
+        Log.d("XX", "Path: " + file.getAbsolutePath());
+        //refresh list;
+        refreshList();
+    }
+
+    public void showDeleteDialog(Context ctx) {
+        mConfirmDeleteDialog = new Dialog(mContext, R.style.CustomWarningDialog);
+        mConfirmDeleteDialog.setContentView(R.layout.custom_warning_dialog);
+        mConfirmDeleteDialog.getWindow().setLayout(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                getWindow().getWindowManager()
+                        .getDefaultDisplay().getHeight());
+        Button ok = (Button) mConfirmDeleteDialog.findViewById(R.id.ok);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doDeleteFile();
+                mConfirmDeleteDialog.dismiss();
+            }
+        });
+        Button cancel = (Button) mConfirmDeleteDialog.findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mConfirmDeleteDialog.dismiss();
+            }
+        });
+        mConfirmDeleteDialog.show();
+    }
+
+    private void sharePic() {
+        File file = mFiles[mPgPhotos.getCurrentItem()];
+        if (file.exists())
+            CaptureLayoutUtil.shareToFacebook(mContext, Uri.parse(file.getAbsolutePath()));
+    }
 }

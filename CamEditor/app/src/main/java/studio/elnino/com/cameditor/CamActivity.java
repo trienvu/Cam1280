@@ -47,13 +47,13 @@ public class CamActivity extends Activity implements AdapterView.OnItemClickList
 
 
     /**
-     * Go through the specified directory, and create items to display in our
+     * Go through the specified directory, and create mFiles to display in our
      * GridView
      */
     private List<GridViewItem> createGridItems(String directoryPath) {
         List<GridViewItem> items = new ArrayList<GridViewItem>();
 
-        // List all the items within the folder.
+        // List all the mFiles within the folder.
         File[] files = new File(directoryPath).listFiles(new ImageFileFilter());
         for (File file : files) {
 
