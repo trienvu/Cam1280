@@ -1,6 +1,7 @@
 package studio.elnino.com.cameditor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import android.content.Context;
 import android.content.Intent;
@@ -77,15 +78,31 @@ public class CaptureLayoutUtil {
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_SEND);
 		intent.setType("image/*");
+		// Type of file to share
+//		intent.setType("image/jpeg");
 
-		intent.putExtra(Intent.EXTRA_TEXT, "https://translate.google.com.vn/?");
+		intent.putExtra(Intent.EXTRA_TEXT, "Image is edited by Camera1280 app");
 		intent.putExtra(Intent.EXTRA_TITLE, "");
 		intent.putExtra(Intent.EXTRA_SUBJECT, "");
 		intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-
 		Intent openInChooser = new Intent(intent);
 		openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intent);
 		ctx.startActivity(openInChooser);
 	}
 
+	public static final void shareFile(Context ctx, File file) {
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_SEND);
+//		intent.setType("image/*");
+
+		intent.setType("*/*");
+
+//		intent.putExtra(Intent.EXTRA_TEXT, "https://translate.google.com.vn/?");
+		intent.putExtra(Intent.EXTRA_TITLE, "");
+		intent.putExtra(Intent.EXTRA_SUBJECT, "");
+		intent.putExtra(Intent.EXTRA_STREAM, file);
+		Intent openInChooser = new Intent(intent);
+		openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intent);
+		ctx.startActivity(openInChooser);
+	}
 }

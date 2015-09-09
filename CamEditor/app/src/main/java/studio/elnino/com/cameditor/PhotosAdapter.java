@@ -42,6 +42,10 @@ public class PhotosAdapter extends PagerAdapter {
         return view == ((ImageView) object);
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {

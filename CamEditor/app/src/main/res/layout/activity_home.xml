@@ -28,16 +28,23 @@
 
         <ImageView
             android:id="@+id/ivDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_toLeftOf="@+id/ivShare"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_toLeftOf="@+id/device"
             android:padding="3dp"
             android:src="@drawable/ic_delete" />
 
+        <View
+            android:id="@+id/device"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/ivShare"
+            android:background="@color/white"></View>
+
         <ImageView
             android:id="@+id/ivShare"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentRight="true"
             android:padding="5dp"
             android:src="@drawable/ic_share" />
@@ -71,6 +78,11 @@
             android:padding="10dp"
             android:text="Camera" />
 
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"></View>
+
         <TextView
             android:id="@+id/tvEdit"
             style="@style/tabs_style"
@@ -81,6 +93,11 @@
             android:gravity="center"
             android:padding="10dp"
             android:text="Edit" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"></View>
 
         <TextView
             android:id="@+id/tvGallery"

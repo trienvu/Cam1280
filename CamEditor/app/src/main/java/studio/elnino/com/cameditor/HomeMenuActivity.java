@@ -37,7 +37,6 @@ import java.io.File;
 public class HomeMenuActivity extends Activity implements Callback {
     private static final String TAG = "HomeMenuActivity";
 
-    private static final String COLLAGE_APP_PACKAGE_NAME = "com.zentertain.photocollage2";
     private static final int ACTION_REQUEST_CAMERA = 0;
     private static final int ACTION_REQUEST_EDIT = 1;
     private static final int ACTION_REQUEST_GALLERY = 2;
@@ -135,19 +134,31 @@ public class HomeMenuActivity extends Activity implements Callback {
         mGalleryFolder = createFolders();
         File targetDirector = new File(mGalleryFolder.getAbsolutePath());
         mFiles = targetDirector.listFiles();
-        if (mFiles == null || mFiles.length == 0)
-            return;
 
         mPhotosAdapter = new PhotosAdapter(this, mFiles);
         mPgPhotos.setAdapter(mPhotosAdapter);
+        updateControl();
     }
 
     private void refreshList() {
         File targetDirector = new File(mGalleryFolder.getAbsolutePath());
         mFiles = targetDirector.listFiles();
+
+        updateControl();
+
         if (mPhotosAdapter == null)
             mPhotosAdapter = new PhotosAdapter(this, mFiles);
         mPhotosAdapter.refreshData(mFiles);
+    }
+
+    private void updateControl() {
+        if (mFiles == null || mFiles.length == 0) {
+            mIvShare.setVisibility(View.INVISIBLE);
+            mIvDelete.setVisibility(View.INVISIBLE);
+        } else {
+            mIvShare.setVisibility(View.VISIBLE);
+            mIvDelete.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -217,15 +228,17 @@ public class HomeMenuActivity extends Activity implements Callback {
                     Log.w(
                             TAG,
                             "User did not modify the image, but just clicked on 'Done' button");
-                } else {
-                    // send a notification to the media scanner
-                    updateMedia(mOutputFilePath);
-
-                    // update the preview with the result
-//                    loadAsync(data.getData());
-                    refreshList();
-                    mOutputFilePath = null;
                 }
+//                } else {
+
+//                }
+                // send a notification to the media scanner
+                updateMedia(mOutputFilePath);
+
+                // update the preview with the result
+//                    loadAsync(data.getData());
+                refreshList();
+                mOutputFilePath = null;
                 break;
         }
     }
@@ -392,12 +405,13 @@ public class HomeMenuActivity extends Activity implements Callback {
     private File createFolders() {
         File baseDir;
 
-        if (android.os.Build.VERSION.SDK_INT < 8) {
-            baseDir = Environment.getExternalStorageDirectory();
-        } else {
-            baseDir = Environment
-                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        }
+//        if (android.os.Build.VERSION.SDK_INT < 8) {
+//            baseDir = Environment.getExternalStorageDirectory();
+//        } else {
+//            baseDir = Environment
+//                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//        }
+        baseDir = Environment.getExternalStorageDirectory();
 
         if (baseDir == null) {
             return Environment.getExternalStorageDirectory();
@@ -464,7 +478,8 @@ public class HomeMenuActivity extends Activity implements Callback {
 
     private void sharePic() {
         File file = mFiles[mPgPhotos.getCurrentItem()];
-        if (file.exists())
-            CaptureLayoutUtil.shareToFacebook(mContext, Uri.parse(file.getAbsolutePath()));
+        if (file.exists()) {
+            CaptureLayoutUtil.shareToFacebook(mContext, Uri.fromFile(file));
+        }
     }
 }
